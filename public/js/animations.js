@@ -1,5 +1,6 @@
 var ACTIVE_ANIMATIONS 	= [],
 	ANIMATIONS 				= [];
+	SIMULATION = []
 
 $(document).ready(bindEvents);
 
@@ -8,8 +9,10 @@ var socket = io.connect('http://' + window.location.hostname);
 socket.on('initialize', function(data){
 	ACTIVE_ANIMATIONS = data.activeAnimations;
 	ANIMATIONS = data.animations;
+	SIMULATION = data.simulation;
 
 	renderInterface();
+	setTimeout(updateSimulation, 1000 / 30)
 });
 
 socket.on('animations', function(activeAnimations){
@@ -17,6 +20,8 @@ socket.on('animations', function(activeAnimations){
 
 	renderInterface();
 });
+
+function updateSimulation
 
 function sync(render){
 	socket.emit('animations', ACTIVE_ANIMATIONS);
@@ -26,9 +31,17 @@ function sync(render){
 }
 
 function renderInterface(){
+
+	$('table.simulation tr').empty();
+
+	for (var i = 0; i < SIMULATION.length; i=+3){
+		$('table.simulation tr'.append($('<td style="background-color: rgb('+SIMULATION[i]+','+SIMULATION[i+1]+','+SIMULATION[i+2]+');">'+i/3+'</td>'));
+	}
+
+
 	$('table.availableAnimations tbody').empty();
 
-	for(var i = 0; i < ANIMATIONS.length; i++){
+	for(i = 0; i < ANIMATIONS.length; i++){
 		$('table.availableAnimations tbody').append($('<tr><td>' + ANIMATIONS[i].name + '</td><td><button class="btn btn-inverse add" data-anim-index="' + i + '">Add</button></td></tr>'));
 	}
 

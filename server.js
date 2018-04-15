@@ -1,14 +1,9 @@
 var http 		= require('http'),
-
 	handler		= require('./static'),
-
-	app			= http.createServer(handler),
-	io			= require('socket.io').listen(app),
-
+	app		= http.createServer(handler),
+	io		= require('socket.io').listen(app),
 	spi 		= require('spi'),
-
 	RPixel		= require('raspberrypixels'),
-
 	AvailableAnimations = require('./animationloader').load()
 	Animations	= []
 
@@ -38,7 +33,8 @@ RenderStrip() // Begin the strip animation
 io.sockets.on('connection', function (socket) {
 	socket.emit('initialize', {
 		animations: Strip(Animations),
-		activeAnimations: Strip(ActiveAnimations)
+		activeAnimations: Strip(ActiveAnimations),
+		simulation: Pixels.buffer
 	})
 
 	socket.on('animations', function(activeAnimations){
@@ -58,11 +54,16 @@ io.sockets.on('connection', function (socket) {
 		socket.broadcast.emit('animations', activeAnimations)
 	})
 
+	socket.on('simulation', function(){
+		socket.broadcast.emit('simulation', Pixels.buffer)
+	}
+
 	socket.on('toggle', function(){
 		RUNNING = !RUNNING
 
 		socket.broadcast.emit('status', RUNNING)
 	})
+
 })
 
 
@@ -80,7 +81,7 @@ function RenderStrip(){
 		Pixels = ActiveAnimations[i].requestFrame(Frame, Pixels)
 	}
 
-	Device.transfer(Pixels.buffer, Pixels.readBuffer)
+	console.log(Pixels.buffer[0],Pixels.buffer[1],Pixels.buffer[2],Pixels.buffer[3],Pixels.buffer)
 
 	if(RUNNING){
 		Frame++
