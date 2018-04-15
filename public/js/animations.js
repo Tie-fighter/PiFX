@@ -28,7 +28,8 @@ function updateSimulation(){
 	for (var i = 0; i < SIMULATION.length; i=+3){
 		$('table.simulation tr'.append($('<td style="background-color: rgb('+SIMULATION[i]+','+SIMULATION[i+1]+','+SIMULATION[i+2]+');">'+i/3+'</td>'));
 	}
-	
+}
+		  
 function sync(render){
 	socket.emit('animations', ACTIVE_ANIMATIONS);
 
