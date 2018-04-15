@@ -11,6 +11,7 @@ socket.on('initialize', function(data){
 	ANIMATIONS = data.animations;
 	SIMULATION = data.simulation;
 
+	updateSimulation();
 	renderInterface();
 	setTimeout(updateSimulation, 1000 / 30)
 });
@@ -21,8 +22,13 @@ socket.on('animations', function(activeAnimations){
 	renderInterface();
 });
 
-function updateSimulation
+function updateSimulation(){
+	$('table.simulation tr').empty();
 
+	for (var i = 0; i < SIMULATION.length; i=+3){
+		$('table.simulation tr'.append($('<td style="background-color: rgb('+SIMULATION[i]+','+SIMULATION[i+1]+','+SIMULATION[i+2]+');">'+i/3+'</td>'));
+	}
+	
 function sync(render){
 	socket.emit('animations', ACTIVE_ANIMATIONS);
 
@@ -31,14 +37,6 @@ function sync(render){
 }
 
 function renderInterface(){
-
-	$('table.simulation tr').empty();
-
-	for (var i = 0; i < SIMULATION.length; i=+3){
-		$('table.simulation tr'.append($('<td style="background-color: rgb('+SIMULATION[i]+','+SIMULATION[i+1]+','+SIMULATION[i+2]+');">'+i/3+'</td>'));
-	}
-
-
 	$('table.availableAnimations tbody').empty();
 
 	for(i = 0; i < ANIMATIONS.length; i++){
