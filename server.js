@@ -11,7 +11,7 @@ var PIXELS  = parseInt(process.env.PIXELS, 10) || 160
 var DEVICE 	= process.env.DEVICE || '/dev/spidev0.0'
 var PORT 	= process.env.PORT || 8888
 
-var FPS		= 30
+var FPS		= 1
 var RUNNING	= true
 
 app.listen(parseInt(PORT, 10))
@@ -24,6 +24,8 @@ var ActiveAnimations 	= []
 var Frame 				= 0
 var ReadBuffer			= new Buffer(PIXELS * 3)
 
+var Simulation = []
+
 for(var i = 0; i < AvailableAnimations.length; i++){
 	Animations.push(new AvailableAnimations[i](PIXELS))
 }
@@ -33,8 +35,7 @@ RenderStrip() // Begin the strip animation
 io.sockets.on('connection', function (socket) {
 	socket.emit('initialize', {
 		animations: Strip(Animations),
-		activeAnimations: Strip(ActiveAnimations),
-		simulation: Pixels.buffer
+		activeAnimations: Strip(ActiveAnimations)
 	})
 
 	socket.on('animations', function(activeAnimations){
@@ -52,10 +53,6 @@ io.sockets.on('connection', function (socket) {
 		}
 
 		socket.broadcast.emit('animations', activeAnimations)
-	})
-
-	socket.on('simulation', function(){
-		socket.broadcast.emit('simulation', Pixels.buffer)
 	})
 
 	socket.on('toggle', function(){
@@ -81,7 +78,14 @@ function RenderStrip(){
 		Pixels = ActiveAnimations[i].requestFrame(Frame, Pixels)
 	}
 
-	console.log(Pixels.buffer[0],Pixels.buffer[1],Pixels.buffer[2],Pixels.buffer[3],Pixels.buffer)
+
+	console.log(Pixels)
+	for (i = 0; i< Pixels.buffer.length;i=i+3) {
+		Simulation[i/3] = [Pixels.buffer[i+2],Pixels.buffer[i+1],Pixels.buffer[i]]
+	}
+
+	io.sockets.emit('simulationUpdate', Simulation) 
+	Device.transfer(Pixels.buffer, Pixels.readBuffer)
 
 	if(RUNNING){
 		Frame++

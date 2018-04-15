@@ -1,6 +1,5 @@
 var ACTIVE_ANIMATIONS 	= [],
-	ANIMATIONS 				= [];
-	SIMULATION = []
+	ANIMATIONS 	= [];
 
 $(document).ready(bindEvents);
 
@@ -9,11 +8,8 @@ var socket = io.connect('http://' + window.location.hostname);
 socket.on('initialize', function(data){
 	ACTIVE_ANIMATIONS = data.activeAnimations;
 	ANIMATIONS = data.animations;
-	SIMULATION = data.simulation;
-
-	updateSimulation();
+	
 	renderInterface();
-	setTimeout(updateSimulation, 1000 / 30)
 });
 
 socket.on('animations', function(activeAnimations){
@@ -22,15 +18,23 @@ socket.on('animations', function(activeAnimations){
 	renderInterface();
 });
 
-function updateSimulation(){
-	$('table.simulation tr').empty();
+socket.on('simulationUpdate', function(data){
+	updateSimulation(data);
+});
 
-	for (var i = 0; i < SIMULATION.length; i=+3){
-		$('table.simulation tr'.append($('<td style="background-color: rgb('+SIMULATION[i]+','+SIMULATION[i+1]+','+SIMULATION[i+2]+');">'+i/3+'</td>'));
+function updateSimulation(data){
+	var SIMULATION = data;
+
+	$('p.simulation').empty();
+
+	for (var i=0; i < SIMULATION.length; i++){
+			$('p.simulation').append($('<em style="background-color: rgb('+SIMULATION[i][0]+','+SIMULATION[i][1]+','+SIMULATION[i][2]+');">'+(i+1)+'</em>'));
 	}
 }
 		  
 function sync(render){
+	console.log("sync()");
+	console.log(ACTIVE_ANIMATIONS);
 	socket.emit('animations', ACTIVE_ANIMATIONS);
 
 	if(render !== false)
