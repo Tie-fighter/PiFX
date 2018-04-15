@@ -11,7 +11,7 @@ var PIXELS  = parseInt(process.env.PIXELS, 10) || 160
 var DEVICE 	= process.env.DEVICE || '/dev/spidev0.0'
 var PORT 	= process.env.PORT || 8888
 
-var FPS		= 1
+var FPS		= 30
 var RUNNING	= true
 
 app.listen(parseInt(PORT, 10))
@@ -79,7 +79,6 @@ function RenderStrip(){
 	}
 
 
-	console.log(Pixels)
 	for (i = 0; i< Pixels.buffer.length;i=i+3) {
 		Simulation[i/3] = [Pixels.buffer[i+2],Pixels.buffer[i+1],Pixels.buffer[i]]
 	}
