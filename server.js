@@ -56,7 +56,7 @@ io.sockets.on('connection', function (socket) {
 
 	socket.on('simulation', function(){
 		socket.broadcast.emit('simulation', Pixels.buffer)
-	}
+	})
 
 	socket.on('toggle', function(){
 		RUNNING = !RUNNING
